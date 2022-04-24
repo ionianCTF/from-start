@@ -1,0 +1,158 @@
+@font-face {
+  font-family: Poppins-Regular;
+  src: url('fonts/poppins/Poppins-Regular.ttf'); 
+}
+
+@font-face {
+  font-family: Poppins-Bold;
+  src: url('fonts/poppins/Poppins-Bold.ttf'); 
+}
+
+@font-face {
+  font-family: Poppins-Medium;
+  src: url('fonts/poppins/Poppins-Medium.ttf'); 
+}
+
+* {
+	margin: 0px; 
+	padding: 0px; 
+	box-sizing: border-box;
+}
+
+body, html {
+	height: 100%;
+	font-family: Poppins-Regular, sans-serif;
+}
+
+.limiter {
+  margin: 0 auto;
+}
+
+.container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: #9053c7;
+  background: -webkit-linear-gradient(-135deg, #c850c0, #4158d0);
+  background: -o-linear-gradient(-135deg, #c850, #4158d0);
+  background: -moz-linear-gradient(-135deg, #c859c0, #4158d0);
+  background: linear-gradient(-135deg, #c850c0, #4158d0);
+}
+
+.wrap {
+  display: inline;
+  padding: 5em;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background-color: #fff;
+  border-radius: 1em;
+  overflow: hidden;
+}
+
+.welcome-pic {
+  width: 10em;
+  height: auto;
+  margin: 2em;
+}
+
+.welcome-link {
+  margin: 1.5em;
+  font-size: 1em;
+}
+
+.welcome-link:hover {
+  color: aqua;
+}
+
+.input-form {
+  text-align: center;
+  vertical-align: center;
+  padding: 0em auto;
+}
+
+input {
+  font-size: 1em;
+  line-height: 1.5;
+  max-width: 15em;
+  min-width: 15em;
+  height: 2.5em;
+  color: #666;
+  background: #e6e6e6;
+  border-radius: 0.8em;
+  display: block;
+  position: relative;
+  padding: 0.2em;
+  margin: 1em;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  outline: none;
+  border: none;
+  padding: 0 5em 0 5em;
+}
+
+input:focus {
+  box-shadow: 0px 0px 0px 0px;
+  color: rgba(87, 184, 70, 0.8);
+  border:#4158d0;
+  padding: 0 1em 0 1em;
+}
+
+button, input[type="submit"]{
+  cursor: pointer;
+  color: #fff;
+  background: #57b846;
+}
+
+
+input[type="submit"]:hover{
+  cursor: pointer;
+  color: #fff;
+  background: #333;
+}
+
+@-webkit-keyframes anim-shadow {
+  to {
+    box-shadow: 0px 0px 70px 25px;
+    opacity: 0;
+  }
+}
+
+/*===============================RESPONSIVENESS===============================*/
+@media (max-with: 992px) {
+  .wrap{
+    padding: 177px 90px 33px 85px;
+  }
+
+  .welcome-pic {
+    width: 35%;
+  }
+  
+  .login-form{
+    width: 50%;
+  }
+}
+
+@media (max-width: 768px) {
+  .wrap {
+    padding: 100px 80px 33px 80px;
+  }
+
+  .welcome-pic {
+    display: 20%;
+  }
+
+  .login-form {
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .wrap {
+    padding: 100px 15px 33px 15px;
+  }
+}
