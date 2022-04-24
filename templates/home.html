@@ -1,4 +1,10 @@
 {% extends "base.html" %}
 {% block body %}
-<h1>HOME</h1>
+<div class="home">
+    {% block main %}
+    {% endblock %}
+</div>
+<a class="welcome-link" href='/logout'>LOGOUT</a>
+<a class="welcome-link" href='/settings'>SETTINGS</a>
+{% include "navbar.html" %}
 {% endblock %}

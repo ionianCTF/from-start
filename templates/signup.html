@@ -1,12 +1,11 @@
 {% extends "base.html" %}
 {% block body %}
-<h1>INPUT</h1>
-<form action="/signup" method='post'>
-    <div class='container'>
-        <input type="text" placeholder="Username" name="username" required>
-        <input type="email" placeholder="Email" name="email" required>
-        <input type="password" placeholder="Password" name="password" required>
-        <button type="submit">Login</button>
-    </div>
+<img class="welcome-pic" src="../static/icons/logo.png" alt="Spotfox™">
+<form class="input-form" action="/signup" method='post' onsubmit="signup(event)">
+    <input type="text" placeholder="Username" name="username" required>
+    <input type="email" placeholder="Email" name="email" required>
+    <input type="password" placeholder="Password" name="password" required>
+    <input type="submit" value="Sign Up">
 </form>
+<a class="welcome-link" href="/login">Log in</a>
 {% endblock %}

@@ -1,55 +1,84 @@
 #!/user/bin/env python3
-from scripts import database, forms, handler
-from flask import Flask, redirect, url_for, render_template, request, session
+from scripts import database, handler
+import flask
 import json
 import sys
 import os
-import ast
 
-app = Flask(__name__)
+app = flask.Flask(__name__)
 app.config["CACHE_TYPE"] = 'null'
 app.secret_key = os.urandom(12)
+#testing
+app.config["TEMPLATES_AUTO_RELOAD"]= True
 
+#==============================HOMEPAGE================================
+@app.route('/', methods=['GET', 'POST'])
+def welcome():
+    if flask.session.get('logged_in'):
+        return flask.render_template('home.html', user=handler.get_user())
+    return flask.render_template('welcome.html')
 
 #==============================LOGIN===================================
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    if not session.get('logged_in'):
-        form = forms.LoginForm(request.form)
-        if request.method == 'POST':
-            username = request.form['username'].lower()
-            password = request.form['password']
-            print(username, password)
-            if form.validate():
-                if handler.credentials_valid(username, password):
-                    session['logged_in'] = True
-                    session['username'] = username
-                    return json.dumps({'status': 'Login successful'})
-                return json.dumps({'status': 'Invalid user/passw'})
-            return json.dumps({'status': 'Both fields required'})
-        return render_template('login.html')
-    user = handler.get_user()
-    return render_template('home.html', user=user)
+    if not flask.session.get('logged_in'):
+        if flask.request.method == 'POST':
+            username = flask.request.form['username'].lower()
+            password = flask.request.form['password']
+            if handler.credentials_valid(username, password):
+                flask.session['logged_in'] = True
+                flask.session['username'] = username
+                return json.dumps({'success': True})
+            return json.dumps({'success': False})
+        return flask.render_template('login.html')
+    return flask.render_template('home.html', user=handler.get_user())
 
-
-
+@app.route("/logout")
+def logout():
+    flask.session['logged_in'] = False
+    flask.session['username'] = null
+    return flask.redirect(flask.url_for('login'))
 
 #============================SIGNUP=====================================
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
-    if not session.get('logged_in'):
-        form = forms.LoginForm(request.form)
-        if request.method == 'POST':
-            username = request.form['username'].lower()
-            password = handler.hash_password(request.form['password'])
-            email = request.form['email']
-            if form.validate():
-                if not handler.username_taken(username):
+    if not flask.session.get('logged_in'):
+        if flask.request.method == 'POST':
+            username = flask.request.form['username'].lower()
+            password = handler.hash_password(flask.request.form['password'])
+            conf_password = handler.hash_password(flask.request.form['confirm-pass'])
+            email = flask.request.form['email']
+            if username != '' and password != '' and conf_password != '':
+                if handler.username_available(username):
+                    return json.dumps({'status': 'username_unavailable'})
+                elif handler.email_available(email):
+                    return json.dumps({'status': 'email_unavailable'})
+                elif password != conf_password:
+                    return json.dumps({'status': 'not_match'})
+                else:
                     handler.add_user(username, password, email)
-                    session['logged_in'] = True
-                    session['username'] = username
-                    return json.dumps({'status': 'Signup successful'})
-                return json.dumps({'status': 'User/Pass required'})
-            return render_template('login.html', form=form)
-        return render_template('signup.html')
-    return render_template('home.html', user=user)
+                    flask.session['logged_in'] = True
+                    flask.session['username'] = username
+                    return flask.render_template('home.html', user=handler.get_user())
+            return json.dumps({'status': 'empty_fields'})
+        return flask.render_template('signup.html')
+    return flask.render_template('home.html', user=handler.get_user())
+
+#==========================Settings=======================================
+@app.route('/settings', methods=['GET', 'POST'])
+def settings():
+    if flask.session.get('logged_in'):
+        if flask.request.method == 'POST':
+            old_password = flask.request.form['old_password']
+            username = flask.session['username']
+            new_password = flask.request.form['new_password']
+            if handler.credentials_valid(username, old_password):
+                if new_password != "":
+                    password = handler.hash_password(new_password)
+                    handler.change_user(password=password)
+                    return json.dumps({'status': 'saved'})
+                return json.dumps({'status': 'Password empty'})
+            return json.dumps({'status': 'Wrong password'})
+        return flask.render_template('settings.html', user=handler.get_user())
+    return flask.redirect(flask.url_for('login'))
+        

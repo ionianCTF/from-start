@@ -4,10 +4,21 @@
         <title>Spotfox</title>
         <meta charset="utf-8">
         <meta name="Spotfox™" content="Spotfox">
+        <link rel="stylesheet" href="../static/css/main.css">
+        <script>
+            var serverData = '{{ serverData }}'; 
+        </script>
         <script src="../static/js/main.js"></script>
     </head>
     <body>
-        {% block body %}
-        {% endblock %}
+        <div class="limiter">
+            <div class="container">
+                <div class="wrap">
+                    <div id="error-message">Error</div>
+                    {% block body %}
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
     </body>
 </html>
