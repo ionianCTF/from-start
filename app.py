@@ -36,7 +36,7 @@ def login():
 @app.route("/logout")
 def logout():
     flask.session['logged_in'] = False
-    flask.session['username'] = null
+    flask.session['username'] = None
     return flask.redirect(flask.url_for('login'))
 
 #============================SIGNUP=====================================
