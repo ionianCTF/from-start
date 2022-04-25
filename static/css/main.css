@@ -1,0 +1,300 @@
+@font-face {
+    font-family: Poppins-Regular;
+    src: url('fonts/poppins/Poppins-Regular.ttf'); 
+}
+
+@font-face {
+    font-family: Poppins-Bold;
+    src: url('fonts/poppins/Poppins-Bold.ttf'); 
+}
+
+@font-face {
+    font-family: Poppins-Medium;
+    src: url('fonts/poppins/Poppins-Medium.ttf'); 
+}
+
+/*=============================VARIABLES==================================*/
+:root {
+	--navbarLinkColor: rgba(0, 0, 0, 0.8);
+	--navbarBackgroundColor: #9053c7 ;
+	--navbarLinkColorUnactive: rgba(63, 13, 51, 0.8);
+	--m: grey;
+	--navbarLinkDisplay: block;
+	--navbarLinkPadding: 2em;
+	--navbarBoxShadow: black;
+	--navbarLinkOutlineWidth: 0.2em;
+	--navbarLinkOutlineColor: black;
+	--navbarLinkOutlineOffset: 1em
+    --rLinkColor: lime;
+	--textUnderlinedLineColor: white;
+    --basicBackgroundColor: linear-gradient(-135deg, rgba(200, 80, 192), rgba(25, 35, 82));
+    --basicBackgroundColorFaded: linear-gradient(-135deg, rgba(200, 80, 192, 0.4), rgba(25, 35, 82, 0.4));
+    --greenLinear: linear-gradient(-135deg, rgb(50, 105, 50), rgb(15, 201, 15));
+    --grayLinearFaded: linear-gradient(-135deg, rgba(202, 202, 202, 0.6), rgba(255, 255, 255, 0.7));
+}
+
+.menu:hover
+.menu_link:not(:hover) {
+    --rLinkColor: var(--menuLinkColorUnactive, rgba(22, 22, 22, 0.3));
+}
+
+* {
+	margin: 0px; 
+	padding: 0px; 
+	box-sizing: border-box;
+}
+
+body, html {
+	height: 100%;
+	font-family: Poppins-Regular, sans-serif;
+}
+
+.container {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: var(--basicBackgroundColor);
+}
+
+.wrap {
+    display: flex;
+    flex-wrap: wrap;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 1em;
+    overflow: hidden;
+    min-height: 100vh;
+}
+
+.welcome-pic {
+    display: block;
+    width: 12em;
+    height: auto;
+    margin: 5em 9em 5em 9em;
+    z-index: 1;
+}
+
+a {
+    text-decoration: none;
+    color: var(--basicBackgroundColor);
+}
+
+a:hover {
+    color: #333;
+}
+
+.link {
+    margin: 1.5em;
+    font-size: 1em;
+    color: #9053c7;
+    padding: 0.5em;
+}
+
+.welcome-link {
+    display: block;
+    color: #9053c7;
+    font-size: 2em;
+    padding: 1em;
+}
+
+.welcome-link:hover {
+    color: rgba(0, 0, 0, 0.8);
+    background: var(--basicBackgroundColorFaded);
+    border-radius: 1em;
+}
+
+.input-form {
+    display: block;
+    text-align: center;
+}
+
+input {
+    display: block;
+    line-height: 1.5;
+    max-width: 18em;
+    min-width: 18em;
+    height: 3.5em;
+    color: #666;
+    background: var(--grayLinearFaded);
+    border-radius: 0.8em;
+    position: relative;
+    margin: 1em 0 1em 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: none;
+    padding: 0.1em;
+    text-align: center;
+    font-size: 1.1em;
+}
+
+input:focus {
+    box-shadow: 0px 0px 0px 0px;
+    border-width: 1em;
+}
+
+input:required::placeholder, input:invalid {
+    color: rgba(255, 0, 0 , 0.6);
+}
+
+input:focus::placeholder {
+    color: transparent;
+}
+
+.middle {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+}
+
+.middle-top {
+    position: absolute;
+    left: 50%;
+    top: 5%;
+    transform: translateX(-50%);
+}
+
+.message {
+    width: 14em;
+    height: 4em;
+    z-index: 2;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border-radius: 1em;
+    pointer-events: none;
+    padding: 0.6em 1em 0.6em 1em;
+    color: rgba(0, 0, 0, 0.3);
+}
+
+#error {
+    display: none;
+    background: rgba(255, 0, 0 , 0.3);
+}
+
+#loading {
+    display: none;
+    background: rgba(104, 216, 13, 0.3);
+}
+button, input[type="submit"]{
+    cursor: pointer;
+    color: #fff;
+    background: var(--greenLinear);
+}
+
+
+input[type="submit"]:hover{
+    cursor: pointer;
+    background: var(--basicBackgroundColor);
+}
+
+/*===============================NAVBAR=======================================*/
+.navbar {
+    --rLinkColor: display: var(--navbarLinkColor, currentColor);
+    background-color: var(--navbarBackgroundColor, #f0f0f0);
+    box-shadow: var(--navbarBoxShadow, 0 1px 3px 0 rgba(0, 0, 0, 0.12), 0 1px 2px 0 rgba(0, 0, 0, 0.24)
+    );
+    border-radius: 1em;
+}
+
+.navbar-list {
+	display: flex;
+    list-style: none;
+}
+
+.navbar-link {
+    color: var(--navbarLinkColor);
+    display: var(--navbarLinkDisplay, block);
+	padding: var(--navbarLinkPadding, 1.5em 2.5em);
+	font-weight: 700;
+	text-transform: uppercase;
+    text-decoration: none;
+}
+
+.navbar-link:focus {
+    outline: var(--navbarLinkOutlineWidth, 2px) solid var(--navbarLinkOutlineColor, currentColor);
+    outline-offset: var(--navbarLinkOutlineOffset);
+}
+
+.navbar:hover
+.navbar-link:not(:hover) {
+    --rLinkColor: var(--navbarLinkColorUnactive, rgba(22, 22, 22, 0.3));
+}
+
+.text-underlined {
+	position: relative;
+	overflow: hidden;
+	will-change: color;
+	transition: color .25s ease-out;
+}
+
+.text-underlined::before, .text-underlined::after {
+	content: "";
+	width: 0;
+	height: 3px;
+	background-color: var(--textUnderlinedLineColor, currentColor);
+	will-change: width;
+	transition: width .1s ease-out;
+
+	position:absolute;
+	bottom: 0;
+}
+
+.text-underlined::before {
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+.text-underlined::after {
+	right: 50%;
+	transform: translateX(50%);
+}
+
+.text-underlined:hover::before,
+.text-underlined:hover::after {
+	width: 100%;
+	transition-duration: .2s
+}
+
+
+/*===============================RESPONSIVENESS===============================*/
+@media (max-with: 992px) {
+    .wrap{
+        padding: 177px 90px 33px 85px;
+    }
+
+    .welcome-pic {
+        width: 35%;
+    }
+    
+    .login-form{
+        width: 50%;
+    }
+}
+
+@media (max-width: 768px) {
+    .wrap {
+        padding: 100px 80px 33px 80px;
+    }
+
+    .welcome-pic {
+        display: 20%;
+    }
+
+    .login-form {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .wrap {
+        padding: 100px 15px 33px 15px;
+    }
+}

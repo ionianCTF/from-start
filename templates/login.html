@@ -1,11 +1,10 @@
 {% extends "base.html" %}
 {% block body %}
-<h1>INPUT</h1>
-<form action="/" method='post'>
-    <div class='container'>
+    <form class='input-form' action='/login' method='post' onsubmit="login(event)">
+        <img class="welcome-pic" src="../static/icons/logo.png" alt="Spotfox™">
         <input type="text" placeholder="Username" name="username" required>
         <input type="password" placeholder="Password" name="password" required>
-        <button type="submit">Login</button>
-    </div>
-</form>
+        <input type="submit" value="Login">
+        <a class="link" class="bar" href="/signup">Create account</a>
+    </form>
 {% endblock %}
