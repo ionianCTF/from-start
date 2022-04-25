@@ -89,3 +89,6 @@ def handle_error(e):
     if isinstance(e, HTTPException):
         code = e.code
     return json.dumps({'error': str(e), 'code': code})
+'''
+@app.errorhandler(500)
+'''
