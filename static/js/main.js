@@ -20,9 +20,7 @@ function login(event) {
         .then(data => {
             if (data.success === false) {
                 displayMessage('error', 'Invalid username and password compination');
-            } else {
-                window.location.reload();
-            } 
+            }
         })
         .catch(error => {
             console.log(error);
