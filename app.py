@@ -29,7 +29,7 @@ def login():
             if handler.credentials_valid(username, password):
                 flask.session['logged_in'] = True
                 flask.session['username'] = username
-                return json.dumps({'success': True}, user=handler.get_user())
+                return json.dumps({'success': True})
             return json.dumps({'success': False})
         return flask.render_template('login.html')
     return flask.render_template('home.html', user=handler.get_user())
