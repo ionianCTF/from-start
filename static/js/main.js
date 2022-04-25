@@ -12,6 +12,7 @@ window.onload = () => {
     const options = {
         method: 'GET'
     }
+
     fetch('/')
         .then(response => {
             if (response === null) {
@@ -34,15 +35,24 @@ function login(event) {
     // Validate user input
     //if (event.target.username.value)
 
+    const controller = new AbortController();
+    // 10 second timeout:
+    const timeoutId = setTimeout(() => {
+        controller.abort();
+    }, 10000);
+
     event.preventDefault();
     const options = {
         method: 'POST',
-        body: new URLSearchParams(new FormData(event.target))
+        body: new URLSearchParams(new FormData(event.target)),
+        signal: controller.signal
     }
+
     displayMessage('loading', '');
     fetch('/login', options)
         .then(response => response.json())
         .then(data => {
+            clearTimeout(timeoutId)
             if (data.success === false) {
                 displayMessage('error', 'Invalid username and password compination');
             } else if (data.success === true) {
@@ -57,6 +67,14 @@ function login(event) {
 
 function signup(event) {
     event.preventDefault();
+
+    const controller = new AbortController();
+    // 10 second timeout:
+    const timeoutId = setTimeout(() => {
+        controller.abort();
+        displayMessage('error', 'Timeout error, please try again or reload');
+    }, 10000);
+
     // Validate user input
     if (!username_regex.test(event.target.username.value)) {
         displayMessage('error', 'Username not available')
@@ -80,6 +98,8 @@ function signup(event) {
                 displayMessage('error', 'Username already in use');
             } else if (data.status === 'not_match') {
                 displayMessage('error', 'Passwords don\'t match');
+            } else if (data.status === 'empty_fields') {
+                displayMessage('error' === 'Please fill the fields with red font');
             } else if (data.status === 'success') {
                 window.location.reload();
             }
