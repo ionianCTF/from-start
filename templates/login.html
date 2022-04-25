@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% block body %}
-    <img class="welcome-pic" src="../static/icons/logo.png" alt="Spotfox™">
     <form class='input-form' action='/login' method='post' onsubmit="login(event)">
+        <img class="welcome-pic" src="../static/icons/logo.png" alt="Spotfox™">
         <input type="text" placeholder="Username" name="username" required>
         <input type="password" placeholder="Password" name="password" required>
         <input type="submit" value="Login">
+        <a class="link" class="bar" href="/signup">Create account</a>
     </form>
-    <a class="link" class="bar" href="/signup">Create account</a>
 {% endblock %}
