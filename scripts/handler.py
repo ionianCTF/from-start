@@ -50,6 +50,7 @@ def add_user(username, password, email):
     u = database.User(username=username, password=password, email=email, confirmedEmail=False, vip=1, created=time.strftime('%Y-%m-%d %H:%M:%S'))
     session.add(u)
     session.commit()
+    print('Successfully added user', username)
 
 def change_user(**kwargs):
     username = flask.session['username']

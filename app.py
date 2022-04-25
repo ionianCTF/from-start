@@ -47,20 +47,18 @@ def signup():
         if flask.request.method == 'POST':
             username = flask.request.form['username'].lower()
             password = handler.hash_password(flask.request.form['password'])
-            conf_password = handler.hash_password(flask.request.form['confirm-pass'])
+            conf_password = handler.hash_password(flask.request.form['password_confirmation'])
             email = flask.request.form['email']
             if username != '' and password != '' and conf_password != '':
                 if handler.username_available(username):
                     return json.dumps({'status': 'username_unavailable'})
                 elif handler.email_available(email):
                     return json.dumps({'status': 'email_unavailable'})
-                elif password != conf_password:
-                    return json.dumps({'status': 'not_match'})
                 else:
                     handler.add_user(username, password, email)
                     flask.session['logged_in'] = True
                     flask.session['username'] = username
-                    return flask.render_template('home.html', user=handler.get_user())
+                    return json.dumps({'status': 'success'})
             return json.dumps({'status': 'empty_fields'})
         return flask.render_template('signup.html')
     return flask.render_template('home.html', user=handler.get_user())
@@ -84,7 +82,7 @@ def settings():
     return flask.redirect(flask.url_for('login'))
         
 
-#=========+++=================ERROR============================================
+#=============================ERROR============================================
 @app.errorhandler(Exception)
 def handle_error(e):
     code = 500
