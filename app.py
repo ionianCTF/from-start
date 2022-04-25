@@ -1,6 +1,7 @@
 #!/user/bin/env python3
 from scripts import database, handler
 import flask
+from werkzeug.exceptions import HTTPException
 import json
 import sys
 import os
@@ -28,7 +29,7 @@ def login():
             if handler.credentials_valid(username, password):
                 flask.session['logged_in'] = True
                 flask.session['username'] = username
-                return json.dumps({'success': True})
+                return json.dumps({'success': True}, user=handler.get_user())
             return json.dumps({'success': False})
         return flask.render_template('login.html')
     return flask.render_template('home.html', user=handler.get_user())
@@ -82,3 +83,11 @@ def settings():
         return flask.render_template('settings.html', user=handler.get_user())
     return flask.redirect(flask.url_for('login'))
         
+
+#=========+++=================ERROR============================================
+@app.errorhandler(Exception)
+def handle_error(e):
+    code = 500
+    if isinstance(e, HTTPException):
+        code = e.code
+    return json.dumps({'error': str(e), 'code': code})
