@@ -12,12 +12,24 @@ app.secret_key = os.urandom(12)
 #testing
 app.config["TEMPLATES_AUTO_RELOAD"]= True
 
+# Objects to return
+HOMEPAGE = json.dumps({'render': 'home'})
+WELCOME = json.dumps({'render': 'welcome'})
+SUCCESS = json.dumps({'success': True})
+FAILURE = json.dumps({'success': False})
+SIGNUP_ERROR = {
+    username: json.dumps({'status': 'username_unavailable'}),
+    email: json.dumps({'status': 'email_unavailable'}),
+    passwords: json.dumps({'status': 'no_match'}),
+    empty: json.dumps({'status': 'empty_fields'})
+}
+
 #==============================HOMEPAGE================================
 @app.route('/', methods=['GET', 'POST'])
 def welcome():
     if flask.session.get('logged_in'):
-        return flask.render_template('home.html', user=handler.get_user())
-    return flask.render_template('welcome.html')
+        return json.dumps({'render': 'home'})    
+    return json.dumps({'render': 'welcome'})
 
 #==============================LOGIN===================================
 @app.route('/login', methods=['GET', 'POST'])
@@ -31,8 +43,8 @@ def login():
                 flask.session['username'] = username
                 return json.dumps({'success': True})
             return json.dumps({'success': False})
-        return flask.render_template('login.html')
-    return flask.render_template('home.html', user=handler.get_user())
+        return json.dumps({'login.html'})
+    return HOMEPAGE
 
 @app.route("/logout")
 def logout():
@@ -61,7 +73,7 @@ def signup():
                     return json.dumps({'status': 'success'})
             return json.dumps({'status': 'empty_fields'})
         return flask.render_template('signup.html')
-    return flask.render_template('home.html', user=handler.get_user())
+    return HOMEPAGE
 
 #==========================Settings=======================================
 @app.route('/settings', methods=['GET', 'POST'])
