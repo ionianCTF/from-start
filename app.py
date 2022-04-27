@@ -27,7 +27,7 @@ EMPTY_ERROR = json.dumps({'status': 'empty_fields'})
 
 #==============================WELCOME-PAGE================================
 @app.route('/', methods=['GET', 'POST'])
-def WELCOME():
+def welcome():
     if flask.session.get('logged_in'):
         return HOMEPAGE    
     return WELCOME
@@ -37,6 +37,7 @@ def WELCOME():
 def login():
     if not flask.session.get('logged_in'):
         if flask.request.method == 'POST':
+            print(flask.request.data)
             username = flask.request.form['username'].lower()
             password = flask.request.form['password']
             if handler.credentials_valid(username, password):
