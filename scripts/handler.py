@@ -34,11 +34,11 @@ def credentials_valid(username, password):
     else:
         return False
 
-def username_available(username):
+def username_exists(username):
     session = get_session()
     return session.query(database.User).filter(database.User.username.in_([username])).first()
 
-def email_available(email):
+def email_exists(email):
     session = get_session()
     return session.query(database.User).filter(database.User.email.in_([email])).first()
 

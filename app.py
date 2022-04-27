@@ -13,25 +13,29 @@ app.secret_key = os.urandom(12)
 app.config["TEMPLATES_AUTO_RELOAD"]= True
 
 # Objects to return
-HOMEPAGE = json.dumps({'render': 'home'})
-WELCOME = json.dumps({'render': 'welcome'})
-SUCCESS = json.dumps({'success': True})
-FAILURE = json.dumps({'success': False})
-SIGNUP_ERROR = {
+render = {
+    homepage: json.dumps({'render': 'home'}),
+    welcome: json.dumps({'render': 'welcome'}),
+    login: json.dumps({'render': 'login'}),
+    signup: json.dumps({'render': 'signup'})
+}
+success = json.dumps({'success': False})
+failure = json.dumps({'success': False})
+signup_error = {
     username: json.dumps({'status': 'username_unavailable'}),
     email: json.dumps({'status': 'email_unavailable'}),
-    passwords: json.dumps({'status': 'no_match'}),
+    passwords: json.dumps({'status': 'password_error'}),
     empty: json.dumps({'status': 'empty_fields'})
 }
 
-#==============================HOMEPAGE================================
+#==============================WELCOME-PAGE================================
 @app.route('/', methods=['GET', 'POST'])
 def welcome():
     if flask.session.get('logged_in'):
-        return json.dumps({'render': 'home'})    
-    return json.dumps({'render': 'welcome'})
+        return render.homepage    
+    return render.welcome
 
-#==============================LOGIN===================================
+#==============================login===================================
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if not flask.session.get('logged_in'):
@@ -41,16 +45,16 @@ def login():
             if handler.credentials_valid(username, password):
                 flask.session['logged_in'] = True
                 flask.session['username'] = username
-                return json.dumps({'success': True})
-            return json.dumps({'success': False})
-        return json.dumps({'login.html'})
-    return HOMEPAGE
+                return success
+            return failure
+        return render.login
+    return render.homepage
 
 @app.route("/logout")
 def logout():
     flask.session['logged_in'] = False
     flask.session['username'] = None
-    return flask.redirect(flask.url_for('login'))
+    return render.login
 
 #============================SIGNUP=====================================
 @app.route('/signup', methods=['GET', 'POST'])
@@ -59,39 +63,41 @@ def signup():
         if flask.request.method == 'POST':
             username = flask.request.form['username'].lower()
             password = handler.hash_password(flask.request.form['password'])
-            conf_password = handler.hash_password(flask.request.form['password_confirmation'])
             email = flask.request.form['email']
-            if username != '' and password != '' and conf_password != '':
-                if handler.username_available(username):
-                    return json.dumps({'status': 'username_unavailable'})
-                elif handler.email_available(email):
-                    return json.dumps({'status': 'email_unavailable'})
-                else:
-                    handler.add_user(username, password, email)
-                    flask.session['logged_in'] = True
-                    flask.session['username'] = username
-                    return json.dumps({'status': 'success'})
-            return json.dumps({'status': 'empty_fields'})
-        return flask.render_template('signup.html')
-    return HOMEPAGE
+            if username != '' or password != '' or conf_password != '':
+                return signup_error.empty
+            if handler.username_exists(username) or len(username) < 8 or len(username) > 25:
+                return signup_error.username
+            elif handler.email_exists(email):
+                return signup_error.email
+            elif len(password) < 8 or len(password) > 25:
+                return signup_error.password
+            else:
+                handler.add_user(username, password, email)
+                flask.session['logged_in'] = True
+                flask.session['username'] = username
+                # TODO add check to know if commit was successful===========================================
+                return success
+        return render.signup
+    return render.homepage
 
 #==========================Settings=======================================
-@app.route('/settings', methods=['GET', 'POST'])
-def settings():
-    if flask.session.get('logged_in'):
-        if flask.request.method == 'POST':
-            old_password = flask.request.form['old_password']
-            username = flask.session['username']
-            new_password = flask.request.form['new_password']
-            if handler.credentials_valid(username, old_password):
-                if new_password != "":
-                    password = handler.hash_password(new_password)
-                    handler.change_user(password=password)
-                    return json.dumps({'status': 'saved'})
-                return json.dumps({'status': 'Password empty'})
-            return json.dumps({'status': 'Wrong password'})
-        return flask.render_template('settings.html', user=handler.get_user())
-    return flask.redirect(flask.url_for('login'))
+#@app.route('/settings', methods=['GET', 'POST'])
+#def settings():
+    #if flask.session.get('logged_in'):
+        #if flask.request.method == 'POST':
+            #old_password = flask.request.form['old_password']
+            #username = flask.session['username']
+            #new_password = flask.request.form['new_password']
+            #if handler.credentials_valid(username, old_password):
+                #if new_password != "":
+                    #password = handler.hash_password(new_password)
+                    #handler.change_user(password=password)
+                    #return json.dumps({'status': 'saved'})
+                #return json.dumps({'status': 'Password empty'})
+            #return json.dumps({'status': 'Wrong password'})
+        #return flask.render_template('settings.html', user=handler.get_user())
+    #return render.login
         
 
 #=============================ERROR============================================
@@ -99,8 +105,7 @@ def settings():
 def handle_error(e):
     code = 500
     if isinstance(e, HTTPException):
-        code = e.code
-    return json.dumps({'error': str(e), 'code': code})
+        return json.dumps({'error': str(e), 'code': e.code})
 '''
 @app.errorhandler(500)
 '''
