@@ -38,20 +38,21 @@ HOMEPAGE = json.dumps({'render': 'home'})
 WELCOME = json.dumps({'render': 'welcome'})
 LOGIN = json.dumps({'render': 'login'})
 SIGNUP = json.dumps({'render': 'signup'})
-SUCCESS = json.dumps({'success': True})
-FAILURE = json.dumps({'success': False})
-USERNAME_ERROR = json.dumps({'status': 'username_unavailable'})
-EMAIL_ERROR = json.dumps({'status': 'email_unavailable'})
-PASSWORD_ERROR = json.dumps({'status': 'password_error'})
-EMPTY_ERROR = json.dumps({'status': 'empty_fields'})
+SIGNUP_ERROR = json.dumps({'error': 'signup_error'})
+INVALID_CREDENTIALS = json.dumps({'error': 'invalid_credentials'})
+USERNAME_ERROR = json.dumps({'error': 'username_unavailable'})
+EMAIL_ERROR = json.dumps({'error': 'email_unavailable'})
+PASSWORD_ERROR = json.dumps({'error': 'password_error'})
+EMPTY_ERROR = json.dumps({'error': 'empty_fields'})
 
 TEST_RESPONSE = json.dumps({'test': 'test_response'})
 
 
-#==============================WELCOME-PAGE================================
-@app.route('/', methods=['GET', 'POST'])
+#==============================WELCOME-PAGE-AUTHORIZATION==============
+@app.route('/', methods=['POST'])
 def welcome():
-    if access_token is not None:
+    print(request.json['access_token']) #TODO time-out
+    if request.json['access_token'] is not None:
         return HOMEPAGE
     return WELCOME
 
@@ -64,7 +65,7 @@ def login():
         access_token = create_access_token(identity=username)
         response = {"access_token": access_token}
         return response
-    return FAILURE
+    return INVALID_CREDENTIALS
 
 @app.route("/logout")
 def logout():
@@ -78,20 +79,22 @@ def signup():
     username = request.json['username'].lower()
     password = handler.hash_password(request.json['password'])
     email = request.json['email']
-    if username != '' or password != '' or conf_password != '':
+    invitation_code = request.json['invitationCode']
+    if username == '' or password == '' or email == '':
         return EMPTY_ERROR
     if handler.username_exists(username) or len(username) < 8 or len(username) > 25:
         return USERNAME_ERROR
     elif handler.email_exists(email):
         return EMAIL_ERROR
-    elif len(password) < 8 or len(password) > 25:
-        return PASSWORD_ERROR
+    #elif len(password) < 8 or len(password) > 25: TODO just check in the front end lol, also this checks the hash not the actual password
+        #return PASSWORD_ERROR
     else:
-        handler.add_user(username, password, email)
-        session['logged_in'] = True
-        session['username'] = username
+        handler.add_user(username, password, email) # TODO add invitation code here!!!
         # TODO add check to know if commit was successful===========================================
-        return SUCCESS
+        access_token = create_access_token(identity=username)
+        response = {"access_token": access_token}
+        return response
+    return SIGNUP_ERROR
 
 #==========================Settings=======================================
 #@app.route('/settings', methods=['GET', 'POST'])
