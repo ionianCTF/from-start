@@ -1,7 +1,7 @@
 #!/user/bin/env python3
 from scripts import database, handler
 from flask import Flask, session, request
-from flask_jwt_extended import create_access_token, get_jwt, get_jwt_identity, unset_jwt_cookies, jwt_required, JWTManager
+from flask_jwt_extended import create_access_token, JWTManager
 from werkzeug.exceptions import HTTPException
 from datetime import timedelta
 import json
@@ -9,29 +9,9 @@ import sys
 import os
 
 app = Flask(__name__)
-#============================TOKEN-CONFIG==================================
 app.config["JWT_SECRET_KEY"] = "please-remember-to-change-me"
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 jwt = JWTManager(app)
-access_token = None
-
-# Token refresh timer
-@app.after_request
-def refresh_expiring_jwts(response):
-    try:
-        exp_timestamp = get_jwt()["exp"]
-        now = datetime.now(timezone.utc)
-        target_timestamp = datetime.timestamp(now + timedelta(minutes=30))
-        if target_timestamp > exp_timestamp:
-            access_token = create_access_token(identity=get_jwt_identity())
-            data = response.get_json()
-            if type(data) is dict:
-                data["access_token"] = access_token 
-                response.data = json.dumps(data)
-        return response
-    except (RuntimeError, KeyError):
-        # Case where there is not a valid JWT. Just return the original respone
-        return response
 
 #=============================RESPONSES====================================
 HOMEPAGE = json.dumps({'render': 'home'})
@@ -45,16 +25,28 @@ EMAIL_ERROR = json.dumps({'error': 'email_unavailable'})
 PASSWORD_ERROR = json.dumps({'error': 'password_error'})
 EMPTY_ERROR = json.dumps({'error': 'empty_fields'})
 
-TEST_RESPONSE = json.dumps({'test': 'test_response'})
+#==============================ACCESS-CONNECTIONS======================
+tokens = []
+usernames = []
+# TODO Token refresh timer
 
-
-#==============================WELCOME-PAGE-AUTHORIZATION==============
+#==============================WELCOME-PAGE============================
 @app.route('/', methods=['POST'])
 def welcome():
     print(request.json['access_token']) #TODO time-out
     if request.json['access_token'] is not None:
-        return HOMEPAGE
+        return json.dumps({'render': 'home'})
     return WELCOME
+
+#==============================AUTHENTICATION=========================
+@app.route('/retrieve_username', methods=['POST'])
+def token_auth():
+    access_token = request.json['access_token']
+    for index, token in enumerate(tokens):
+        if token == access_token:
+            return json.dumps({'username': usernames[index]})
+    return json.dumps({'error': 'invalid_token'})
+    
 
 #==============================LOGIN===================================
 @app.route('/login', methods=['POST'])
@@ -63,6 +55,8 @@ def login():
     password = request.json['password']
     if handler.credentials_valid(username, password):
         access_token = create_access_token(identity=username)
+        tokens.append(access_token)
+        usernames.append(username)
         response = {"access_token": access_token}
         return response
     return INVALID_CREDENTIALS
