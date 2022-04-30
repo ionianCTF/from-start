@@ -9,8 +9,8 @@ import sys
 import os
 
 app = Flask(__name__)
-app.config["JWT_SECRET_KEY"] = "please-remember-to-change-me"
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
+app.config['JWT_SECRET_KEY'] = 'please-remember-to-change-me'
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
 jwt = JWTManager(app)
 
 #=============================RESPONSES====================================
@@ -27,24 +27,16 @@ EMPTY_ERROR = json.dumps({'error': 'empty_fields'})
 
 #==============================ACCESS-CONNECTIONS======================
 tokens = []
-usernames = []
+users = []
 # TODO Token refresh timer
 
-#==============================WELCOME-PAGE============================
+#==============================AUTHENTICATION=========================
 @app.route('/', methods=['POST'])
 def welcome():
-    print(request.json['access_token']) #TODO time-out
-    if request.json['access_token'] is not None:
-        return json.dumps({'render': 'home'})
-    return WELCOME
-
-#==============================AUTHENTICATION=========================
-@app.route('/retrieve_username', methods=['POST'])
-def token_auth():
     access_token = request.json['access_token']
     for index, token in enumerate(tokens):
         if token == access_token:
-            return json.dumps({'username': usernames[index]})
+            return json.dumps({'user_data': users[index]})
     return json.dumps({'error': 'invalid_token'})
     
 
@@ -56,12 +48,13 @@ def login():
     if handler.credentials_valid(username, password):
         access_token = create_access_token(identity=username)
         tokens.append(access_token)
-        usernames.append(username)
-        response = {"access_token": access_token}
+        user_data = handler.get_user_data(username)
+        users.append(user_data)
+        response = {'access_token': access_token, 'user_data': user_data}
         return response
     return INVALID_CREDENTIALS
 
-@app.route("/logout")
+@app.route('/logout')
 def logout():
     session['logged_in'] = False
     session['username'] = None
@@ -86,7 +79,10 @@ def signup():
         handler.add_user(username, password, email) # TODO add invitation code here!!!
         # TODO add check to know if commit was successful===========================================
         access_token = create_access_token(identity=username)
-        response = {"access_token": access_token}
+        tokens.append(access_token)
+        user_data = handler.get_user_data(username)
+        users.append(user_data)
+        response = {'access_token': access_token, 'user_data': user_data}
         return response
     return SIGNUP_ERROR
 
@@ -99,7 +95,7 @@ def signup():
             #username = session['username']
             #new_password = request.json['new_password']
             #if handler.credentials_valid(username, old_password):
-                #if new_password != "":
+                #if new_password != '':
                     #password = handler.hash_password(new_password)
                     #handler.change_user(password=password)
                     #return json.dumps({'status': 'saved'})

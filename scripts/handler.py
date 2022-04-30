@@ -4,6 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from contextlib import contextmanager
 import bcrypt
 import time
+import json
 
 @contextmanager
 def session_scope():
@@ -60,3 +61,8 @@ def change_user(**kwargs):
         if val != "":
             setattr(user, arg, val)
     session.commit()
+
+def get_user_data(username):
+    session = get_session()
+    user = json.loads(str(session.query(database.User).first()))
+    return (user)
