@@ -1,9 +1,10 @@
 import os
+import json
 from sqlalchemy import create_engine, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.automap import automap_base
 
-SQLALCHEMY_DATABASE_URI = 'mysql://b6bd5b14578f94:30a1b042@us-cdbr-east-05.cleardb.net/heroku_a38d37cd5653d5e'
+SQLALCHEMY_DATABASE_URI = 'mysql://bc53e4e5b304e4:9d8c24da@eu-cdbr-west-02.cleardb.net/heroku_193f13a231d0e1b'
 engine = create_engine(SQLALCHEMY_DATABASE_URI, future=True, connect_args={'connect_timeout': 1000})
 Base = declarative_base()
 
@@ -11,24 +12,32 @@ class User(Base):
     __table__ = Table('user', Base.metadata, autoload=True, autoload_with=engine)
 
     def __repr__(self):
-        return '<User(name={0}, ) %r>' % self.username
-
-class Vip(Base):
-    __table__ = Table('vip', Base.metadata, autoload=True, autoload_with=engine)
-
-    def __repr__(self):
-        return '<User(name={0}, ) %r>' % self.id
+        return json.dumps({
+            'id': self.id,
+            'username': self.username,
+            'email': self.email,
+            'confirmedEmail': self.confirmedEmail,
+            'created': self.created,
+            'vip': self.vip,
+            'lastActive': self.lastActive,
+            'invitationCode': self.invitationCode,
+            'invitationCommision': self.invitationCommision
+        }, indent=4, sort_keys=True, default=str)
 
 class Task(Base):
     __table__ = Table('task', Base.metadata, autoload=True, autoload_with=engine)
 
     def __repr__(self):
-        return '<User(name={0}, ) %r>' % self.id
-
-class Social(Base):
-    __table__ = Table('social', Base.metadata, autoload=True, autoload_with=engine)
-
-    def __repr__(self):
-        return '<User(name={0}, ) %r>' % self.id
+        return json.dumps({
+            'id': self.id,
+            'user': self.user,
+            'social': self.social,
+            'status': self.status,
+            'created': self.created,
+            'duration': self.duration,
+            'requirements': self.requirements,
+            'link': self.link,
+            'submited': self.submited
+        }, indent=4, sort_keys=True, default=str)
 
 Base.metadata.create_all(engine)

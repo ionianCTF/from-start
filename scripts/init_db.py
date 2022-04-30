@@ -5,7 +5,7 @@ from sqlalchemy import Column, Integer, String, Boolean, Date, DateTime, Float, 
 from sqlalchemy.ext.declarative import declarative_base
 
 # Local
-SQLALCHEMY_DATABASE_URI = 'mysql://b6bd5b14578f94:30a1b042@us-cdbr-east-05.cleardb.net/heroku_a38d37cd5653d5e'
+SQLALCHEMY_DATABASE_URI = 'mysql://bc53e4e5b304e4:9d8c24da@eu-cdbr-west-02.cleardb.net/heroku_193f13a231d0e1b'
 
 Base = declarative_base()
 
@@ -23,43 +23,33 @@ class User(Base):
     username = Column(String(25), unique=True)
     password = Column(String(512))
     email = Column(String(50), unique=True)
-    confirmedEmail= Column(Boolean, unique=False, default=True)
+    confirmedEmail = Column(Boolean, unique=False, default=False)
     created = Column(Date)
-    vip = Column(Integer, ForeignKey('vip.id'))
+    vip = Column(Integer)
     lastActive = Column(DateTime)
     invitationCode = Column(String(10))
     invitationCommision = Column(Float)
+    picUrl = String(String(50))
 
     def __repr__(self):
-        return '<User %r>' % self.username
-
-class Vip(Base):
-    __tablename__ = "vip"
-    
-    id = Column(Integer, primary_key=True)
-    price = Column(Float)
-    daily = Column(Integer)
-    cost = Column(Integer)
-
-    def __repr__(self):
-        return '<VIP %r>' % self.id
-    
-class Social(Base):
-    __tablename__ = "social"
-    
-    id = Column(Integer, primary_key=True)
-    name = Column(String(20))
-    color = Column(Integer)
-
-    def __repr__(self):
-        return '<Social %r>' % self.name
+        return {
+            'id': self.id,
+            'username': self.username,
+            'email': self.email,
+            'confirmedEmail': self.confirmedEmail,
+            'created': self.created,
+            'vip': self.vip,
+            'lastActive': self.lastActive,
+            'invitationCode': self.invitationCode,
+            'invitationCommision': self.invitationCommision
+        }
 
 class Task(Base):
     __tablename__ = "task"
     
     id = Column(Integer, primary_key=True)
     user = Column(Integer, ForeignKey('user.id'))
-    social = Column(Integer, ForeignKey('social.id'))
+    social = Column(Integer)
     status = Column(Integer)
     created = Column(DateTime)
     duration = Column(Integer)
@@ -68,7 +58,17 @@ class Task(Base):
     submited = Column(DateTime)
 
     def __repr__(self):
-        return '<Task %r>' % self.link
+        return {
+            'id': self.id,
+            'user': self.user,
+            'social': self.social,
+            'status': self.status,
+            'created': self.created,
+            'duration': self.duration,
+            'requirements': self.requirements,
+            'link': self.link,
+            'submited': self.submited
+        }
 
 engine = db_connect()  # Connect to database
 Base.metadata.create_all(engine)  # Create models
