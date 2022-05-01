@@ -12,21 +12,37 @@ session = scoped_session(sessionmaker(bind=database.engine))
 
 def get_user():
     username = flask.session['username']
-    user = session.query(database.User).filter(database.User.username.in_([username])).first()
-    return user
+    try:
+        user = session.query(database.User).filter(database.User.username.in_([username])).first()
+        return user
+    except:
+        session.rollback()
+        raise
 
 def credentials_valid(username, password):
-    user = session.query(database.User).filter(database.User.username.in_([username])).first()
-    if user:
-        return bcrypt.checkpw(password.encode('utf8'), user.password.encode('utf8'))
-    else:
-        return False
+    try:
+        user = session.query(database.User).filter(database.User.username.in_([username])).first()
+        if user:
+            return bcrypt.checkpw(password.encode('utf8'), user.password.encode('utf8'))
+        else:
+            return False
+    except:
+        session.rollback()
+        raise
 
 def username_exists(username):
-    return session.query(database.User).filter(database.User.username.in_([username])).first()
+    try:
+        return session.query(database.User).filter(database.User.username.in_([username])).first()
+    except:
+        session.rollback()
+        raise
 
 def email_exists(email):
-    return session.query(database.User).filter(database.User.email.in_([email])).first()
+    try:
+        return session.query(database.User).filter(database.User.email.in_([email])).first()
+    except:
+        session.rollback()
+        raise
 
 def hash_password(password):
     return bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
@@ -37,9 +53,8 @@ def add_user(username, password, email):
     try:
         session.commit()
     except:
+        session.rollback()
         raise
-    finally:
-        session.close()
     print('Successfully added user', username)
 
 def change_user(**kwargs):
@@ -51,18 +66,25 @@ def change_user(**kwargs):
     try:
         session.commit()
     except:
+        session.rollback()
         raise
-    finally:
-        session.close()
 
 def create_random_code(session):
-    chars=string.ascii_uppercase + string.digits
-    size = 10
-    code = ''.join(random.choice(chars) for _ in range(size))
-    while session.query(database.User).filter(database.User.invitationCode.in_([code])).first():
+    try:
+        chars=string.ascii_uppercase + string.digits
+        size = 10
         code = ''.join(random.choice(chars) for _ in range(size))
-    return code
+        while session.query(database.User).filter(database.User.invitationCode.in_([code])).first():
+            code = ''.join(random.choice(chars) for _ in range(size))
+        return code
+    except:
+        session.rollback()
+        raise
 
 def get_user_data(username):
-    user = json.loads(str(session.query(database.User).filter(database.User.username.in_([username])).first()))
-    return user
+    try:
+        user = json.loads(str(session.query(database.User).filter(database.User.username.in_([username])).first()))
+        return user
+    except:
+        session.rollback()
+        raise

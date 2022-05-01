@@ -39,7 +39,6 @@ def welcome():
     access_token = request.json['access_token']
     if access_token in tokens:
         while True:
-            print('heroku_testing')
             user_data = ''
             for index, token in enumerate(tokens):
                 if token == access_token:
@@ -47,7 +46,6 @@ def welcome():
             if user_data != None and user_data != '': break
         return json.dumps({'user_data': user_data})
     return json.dumps({'error': 'invalid_token'})
-    
 
 #==============================LOGIN===================================
 @app.route('/login', methods=['POST'])
