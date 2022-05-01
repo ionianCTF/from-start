@@ -1,6 +1,7 @@
 import os
 import json
 from sqlalchemy import create_engine, Table
+from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.automap import automap_base
 
@@ -21,7 +22,8 @@ class User(Base):
             'vip': self.vip,
             'lastActive': self.lastActive,
             'invitationCode': self.invitationCode,
-            'invitationCommision': self.invitationCommision
+            'invitationCommision': self.invitationCommision,
+            'picUrl': self.picUrl
         }, indent=4, sort_keys=True, default=str)
 
 class Task(Base):
@@ -41,3 +43,4 @@ class Task(Base):
         }, indent=4, sort_keys=True, default=str)
 
 Base.metadata.create_all(engine)
+session = scoped_session, sessionmaker(autocommit=False, autoflush=False, bind=engine)

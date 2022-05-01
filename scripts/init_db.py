@@ -27,9 +27,9 @@ class User(Base):
     created = Column(Date)
     vip = Column(Integer)
     lastActive = Column(DateTime)
-    invitationCode = Column(String(10))
+    invitationCode = Column(String(10), unique=True)
     invitationCommision = Column(Float)
-    picUrl = String(String(50))
+    picUrl = Column(String(10))
 
     def __repr__(self):
         return {
@@ -41,7 +41,8 @@ class User(Base):
             'vip': self.vip,
             'lastActive': self.lastActive,
             'invitationCode': self.invitationCode,
-            'invitationCommision': self.invitationCommision
+            'invitationCommision': self.invitationCommision,
+            'picUrl': self.picUrl
         }
 
 class Task(Base):

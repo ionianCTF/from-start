@@ -9,8 +9,9 @@ import sys
 import os
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_POOL_RECYCLE'] = 28800 - 1
+app.config['SQLALCHEMY_POOL_TIMEOUT'] = 18000
 app.config['JWT_SECRET_KEY'] = 'please-remember-to-change-me'
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
 jwt = JWTManager(app)
 
 #=============================RESPONSES====================================
