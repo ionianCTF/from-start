@@ -37,13 +37,13 @@ users = []
 @app.route('/', methods=['POST'])
 def welcome():
     access_token = request.json['access_token']
-    while True:
-        for index, token in enumerate(tokens):
-            if token == access_token:
-                response = json.dumps({'user_data': users[index]})
-                if users[index] != None: break
-    return response
-
+    if access_token != '':
+        while True:
+            for index, token in enumerate(tokens):
+                if token == access_token:
+                    response = json.dumps({'user_data': users[index]})
+                    if users[index] != None: break
+        return response
     return json.dumps({'error': 'invalid_token'})
     
 
