@@ -51,7 +51,7 @@ def login():
         tokens.append(access_token)
         user_data = handler.get_user_data(username)
         users.append(user_data)
-        response = {'access_token': access_token, 'user_data': user_data}
+        response = json.dumps({'access_token': access_token, 'user_data': user_data})
         return response
     return INVALID_CREDENTIALS
 
