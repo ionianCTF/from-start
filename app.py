@@ -40,6 +40,7 @@ def welcome():
     if access_token != '':
         while True:
             print('heroku_testing')
+            user_data = ''
             for index, token in enumerate(tokens):
                 if token == access_token:
                     user_data = users[index]
