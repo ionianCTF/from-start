@@ -28,8 +28,11 @@ class User(Base):
     vip = Column(Integer)
     lastActive = Column(DateTime)
     invitationCode = Column(String(10), unique=True)
-    invitationCommision = Column(Float)
-    picUrl = Column(String(10))
+    picUrl = Column(String(10)),
+    balance = Column(Float, default=0.00)
+    taskProfit = Column(Float, default=0.00)
+    invitationCommision = Column(Float, default=0.00)
+
 
     def __repr__(self):
         return {
@@ -42,7 +45,10 @@ class User(Base):
             'lastActive': self.lastActive,
             'invitationCode': self.invitationCode,
             'invitationCommision': self.invitationCommision,
-            'picUrl': self.picUrl
+            'picUrl': self.picUrl,
+            'balance': self.balance,
+            'taskProfit': self.taskProfit,
+            'invitationCommision': self.invitationCommision
         }
 
 class Task(Base):
@@ -72,4 +78,6 @@ class Task(Base):
         }
 
 engine = db_connect()  # Connect to database
-Base.metadata.create_all(engine)  # Create models
+User.__table__.drop(engine) # Drop tables
+Task.__table__.drop(engine)
+Base.metadata.create_all(engine)  # Create models and tables
