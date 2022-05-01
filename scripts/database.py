@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.automap import automap_base
 
 SQLALCHEMY_DATABASE_URI = 'mysql://bc53e4e5b304e4:9d8c24da@eu-cdbr-west-02.cleardb.net/heroku_193f13a231d0e1b'
-engine = create_engine(SQLALCHEMY_DATABASE_URI, connect_args={'connect_timeout': 1000, 'pool_timeout': 20, 'pool_recycle': 299})
+engine = create_engine(SQLALCHEMY_DATABASE_URI, future=True, connect_args={'connect_timeout': 1000})
 Base = declarative_base()
 
 class User(Base):
