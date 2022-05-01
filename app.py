@@ -37,7 +37,7 @@ users = []
 @app.route('/', methods=['POST'])
 def welcome():
     access_token = request.json['access_token']
-    if access_token != '':
+    if access_token in tokens:
         while True:
             print('heroku_testing')
             user_data = ''
