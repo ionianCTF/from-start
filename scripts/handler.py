@@ -1,6 +1,6 @@
 from scripts import database
 import flask
-from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy.orm import sessionmaker
 from contextlib import contextmanager
 import bcrypt
 import time
@@ -8,11 +8,10 @@ import json
 import string
 import random
 
-session = scoped_session(sessionmaker(bind=database.engine))
-
 def get_user():
     username = flask.session['username']
     try:
+        session = sessionmaker(bind=database.engine)()
         user = session.query(database.User).filter(database.User.username.in_([username])).first()
         return user
     except:
@@ -21,6 +20,7 @@ def get_user():
 
 def credentials_valid(username, password):
     try:
+        session = sessionmaker(bind=database.engine)()
         user = session.query(database.User).filter(database.User.username.in_([username])).first()
         if user:
             return bcrypt.checkpw(password.encode('utf8'), user.password.encode('utf8'))
@@ -32,6 +32,7 @@ def credentials_valid(username, password):
 
 def username_exists(username):
     try:
+        session = sessionmaker(bind=database.engine)()
         return session.query(database.User).filter(database.User.username.in_([username])).first()
     except:
         session.rollback()
@@ -39,6 +40,7 @@ def username_exists(username):
 
 def email_exists(email):
     try:
+        session = sessionmaker(bind=database.engine)()
         return session.query(database.User).filter(database.User.email.in_([email])).first()
     except:
         session.rollback()
@@ -51,6 +53,7 @@ def add_user(username, password, email):
     u = database.User(username=username, password=password, email=email, confirmedEmail=False, vip=1, created=time.strftime('%Y-%m-%d %H:%M:%S'), invitationCode=create_random_code(session))
     session.add(u)
     try:
+        session = sessionmaker(bind=database.engine)()
         session.commit()
     except:
         session.rollback()
@@ -64,6 +67,7 @@ def change_user(**kwargs):
         if val != "":
             setattr(user, arg, val)
     try:
+        session = sessionmaker(bind=database.engine)()
         session.commit()
     except:
         session.rollback()
@@ -71,6 +75,7 @@ def change_user(**kwargs):
 
 def create_random_code(session):
     try:
+        session = sessionmaker(bind=database.engine)()
         chars=string.ascii_uppercase + string.digits
         size = 10
         code = ''.join(random.choice(chars) for _ in range(size))
@@ -83,6 +88,7 @@ def create_random_code(session):
 
 def get_user_data(username):
     try:
+        session = sessionmaker(bind=database.engine)()
         user = json.loads(str(session.query(database.User).filter(database.User.username.in_([username])).first()))
         return user
     except:
