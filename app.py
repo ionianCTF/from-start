@@ -38,6 +38,7 @@ users = []
 def welcome():
     access_token = request.json['access_token']
     if access_token == '':
+        print('Tokens:', tokens)
         while True:
             for index, token in enumerate(tokens):
                 if token == access_token:
