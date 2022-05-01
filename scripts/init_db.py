@@ -28,7 +28,7 @@ class User(Base):
     vip = Column(Integer)
     lastActive = Column(DateTime)
     invitationCode = Column(String(10), unique=True)
-    picUrl = Column(String(10)),
+    picUrl = Column(String(10))
     balance = Column(Float, default=0.00)
     taskProfit = Column(Float, default=0.00)
     invitationCommision = Column(Float, default=0.00)
@@ -78,6 +78,6 @@ class Task(Base):
         }
 
 engine = db_connect()  # Connect to database
-User.__table__.drop(engine) # Drop tables
 Task.__table__.drop(engine)
+User.__table__.drop(engine) # Drop tables
 Base.metadata.create_all(engine)  # Create models and tables
