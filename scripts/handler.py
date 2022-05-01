@@ -10,18 +10,6 @@ import random
 
 session = scoped_session(sessionmaker(bind=database.engine))
 
-@contextmanager
-def session_scope():
-    s = get_session()
-    s.expire_on_commit = False
-    try:
-        yield s
-        s.commit()
-    except:
-        s.rollback()
-    finally:
-        s.close()
-
 def get_user():
     username = flask.session['username']
     user = session.query(database.User).filter(database.User.username.in_([username])).first()
@@ -46,7 +34,12 @@ def hash_password(password):
 def add_user(username, password, email):
     u = database.User(username=username, password=password, email=email, confirmedEmail=False, vip=1, created=time.strftime('%Y-%m-%d %H:%M:%S'), invitationCode=create_random_code(session))
     session.add(u)
-    session.commit()
+    try:
+        session.commit()
+    except:
+        raise
+    finally:
+        session.close()
     print('Successfully added user', username)
 
 def change_user(**kwargs):
@@ -55,7 +48,12 @@ def change_user(**kwargs):
     for arg, val in kwargs.items():
         if val != "":
             setattr(user, arg, val)
-    session.commit()
+    try:
+        session.commit()
+    except:
+        raise
+    finally:
+        session.close()
 
 def create_random_code(session):
     chars=string.ascii_uppercase + string.digits
