@@ -35,7 +35,6 @@ users = []
 
 #==============================AUTHENTICATION=========================
 @app.route('/', methods=['POST'])
-@cross_origin()
 def welcome():
     access_token = request.json['access_token']
     for index, token in enumerate(tokens):
@@ -46,7 +45,6 @@ def welcome():
 
 #==============================LOGIN===================================
 @app.route('/login', methods=['POST'])
-@cross_origin()
 def login():
     username = request.json['username'].lower()
     password = request.json['password']
@@ -60,7 +58,6 @@ def login():
     return INVALID_CREDENTIALS
 
 @app.route('/logout')
-@cross_origin()
 def logout():
     session['logged_in'] = False
     session['username'] = None
@@ -68,7 +65,6 @@ def logout():
 
 #============================SIGNUP=====================================
 @app.route('/signup', methods=['POST'])
-@cross_origin()
 def signup():
     username = request.json['username'].lower()
     password = handler.hash_password(request.json['password'])
