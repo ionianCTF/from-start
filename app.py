@@ -2,6 +2,7 @@
 from scripts import database, handler
 from flask import Flask, session, request
 from flask_jwt_extended import create_access_token, JWTManager
+from flask_cors import CORS, cross_origin
 from werkzeug.exceptions import HTTPException
 from datetime import timedelta
 import json
@@ -9,6 +10,7 @@ import sys
 import os
 
 app = Flask(__name__)
+CORS(app)
 app.config['SQLALCHEMY_POOL_RECYCLE'] = 28800 - 1
 app.config['SQLALCHEMY_POOL_TIMEOUT'] = 18000
 app.config['JWT_SECRET_KEY'] = 'please-remember-to-change-me'
@@ -33,6 +35,7 @@ users = []
 
 #==============================AUTHENTICATION=========================
 @app.route('/', methods=['POST'])
+@cross_origin()
 def welcome():
     access_token = request.json['access_token']
     for index, token in enumerate(tokens):
@@ -43,6 +46,7 @@ def welcome():
 
 #==============================LOGIN===================================
 @app.route('/login', methods=['POST'])
+@cross_origin()
 def login():
     username = request.json['username'].lower()
     password = request.json['password']
@@ -56,6 +60,7 @@ def login():
     return INVALID_CREDENTIALS
 
 @app.route('/logout')
+@cross_origin()
 def logout():
     session['logged_in'] = False
     session['username'] = None
@@ -63,6 +68,7 @@ def logout():
 
 #============================SIGNUP=====================================
 @app.route('/signup', methods=['POST'])
+@cross_origin()
 def signup():
     username = request.json['username'].lower()
     password = handler.hash_password(request.json['password'])
