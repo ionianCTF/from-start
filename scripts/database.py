@@ -23,7 +23,10 @@ class User(Base):
             'lastActive': self.lastActive,
             'invitationCode': self.invitationCode,
             'invitationCommision': self.invitationCommision,
-            'picUrl': self.picUrl
+            'picUrl': self.picUrl,
+            'balance': self.balance,
+            'taskProfit': self.taskProfit,
+            'invitationCommision': self.invitationCommision
         }, indent=4, sort_keys=True, default=str)
 
 class Task(Base):
