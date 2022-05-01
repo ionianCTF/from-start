@@ -49,10 +49,12 @@ def login():
     username = request.json['username'].lower()
     password = request.json['password']
     if handler.credentials_valid(username, password):
-        access_token = create_access_token(identity=username)
-        tokens.append(access_token)
-        user_data = handler.get_user_data(username)
-        users.append(user_data)
+        while True:
+            access_token = create_access_token(identity=username)
+            tokens.append(access_token)
+            user_data = handler.get_user_data(username)
+            users.append(user_data)
+            if user_data != None and access_token != None: break
         response = json.dumps({'access_token': access_token, 'user_data': user_data})
         return response
     return INVALID_CREDENTIALS
@@ -79,12 +81,14 @@ def signup():
     #elif len(password) < 8 or len(password) > 25: TODO just check in the front end lol, also this checks the hash not the actual password
         #return PASSWORD_ERROR
     else:
-        handler.add_user(username, password, email) # TODO add invitation code here!!!
-        # TODO add check to know if commit was successful===========================================
-        access_token = create_access_token(identity=username)
-        tokens.append(access_token)
-        user_data = handler.get_user_data(username)
-        users.append(user_data)
+        while True:
+            handler.add_user(username, password, email) # TODO add invitation code here!!!
+            # TODO add check to know if commit was successful===========================================
+            access_token = create_access_token(identity=username)
+            tokens.append(access_token)
+            user_data = handler.get_user_data(username)
+            users.append(user_data)
+            if user_data != None and access_token != None: break
         response = {'access_token': access_token, 'user_data': user_data}
         return response
     return SIGNUP_ERROR
