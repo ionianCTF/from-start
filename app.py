@@ -57,7 +57,7 @@ def login():
         while True:
             access_token = create_access_token(identity=username)
             user_data = handler.get_user_data(username)
-            if user_data != None or access_token != None: 
+            if user_data != None and access_token != None: 
                 tokens.append(access_token)
                 users.append(user_data)
                 break
@@ -92,7 +92,7 @@ def signup():
             # TODO add check to know if commit was successful===========================================
             access_token = create_access_token(identity=username)
             user_data = handler.get_user_data(username)
-            if user_data != None or access_token != None: 
+            if user_data != None and access_token != None: 
                 tokens.append(access_token)
                 users.append(user_data)
                 break
