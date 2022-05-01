@@ -37,9 +37,13 @@ users = []
 @app.route('/', methods=['POST'])
 def welcome():
     access_token = request.json['access_token']
-    for index, token in enumerate(tokens):
-        if token == access_token:
-            return json.dumps({'user_data': users[index]})
+    while True:
+        for index, token in enumerate(tokens):
+            if token == access_token:
+                response = json.dumps({'user_data': users[index]})
+                if users[index] != None: break
+    return response
+
     return json.dumps({'error': 'invalid_token'})
     
 
@@ -51,10 +55,11 @@ def login():
     if handler.credentials_valid(username, password):
         while True:
             access_token = create_access_token(identity=username)
-            tokens.append(access_token)
             user_data = handler.get_user_data(username)
-            users.append(user_data)
-            if user_data != None and access_token != None: break
+            if user_data != None and access_token != None: 
+                tokens.append(access_token)
+                users.append(user_data)
+                break
         response = json.dumps({'access_token': access_token, 'user_data': user_data})
         return response
     return INVALID_CREDENTIALS
@@ -85,10 +90,11 @@ def signup():
             handler.add_user(username, password, email) # TODO add invitation code here!!!
             # TODO add check to know if commit was successful===========================================
             access_token = create_access_token(identity=username)
-            tokens.append(access_token)
             user_data = handler.get_user_data(username)
-            users.append(user_data)
-            if user_data != None and access_token != None: break
+            if user_data != None and access_token != None: 
+                tokens.append(access_token)
+                users.append(user_data)
+                break
         response = {'access_token': access_token, 'user_data': user_data}
         return response
     return SIGNUP_ERROR
