@@ -44,7 +44,7 @@ def welcome():
             for index, token in enumerate(tokens):
                 if token == access_token:
                     user_data = users[index]
-            if user_data != None: break
+            if user_data != None and user_data != '': break
         return json.dumps({'user_data': user_data})
     return json.dumps({'error': 'invalid_token'})
     
