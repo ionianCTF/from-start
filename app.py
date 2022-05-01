@@ -37,7 +37,7 @@ users = []
 @app.route('/', methods=['POST'])
 def welcome():
     access_token = request.json['access_token']
-    if access_token == '':
+    if access_token != '':
         while True:
             for index, token in enumerate(tokens):
                 if token == access_token:
