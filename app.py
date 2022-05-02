@@ -1,20 +1,27 @@
 #!/user/bin/env python3
-from scripts import database, handler
+import database
 from flask import Flask, session, request
 from flask_jwt_extended import create_access_token, JWTManager
 from flask_cors import CORS, cross_origin
+from flask_sqlalchemy import SQLAlchemy
 from werkzeug.exceptions import HTTPException
 from datetime import timedelta
 import json
 import sys
 import os
+import sqlite3
+
+SQLALCHEMY_DATABASE_URI = 'sqlite:///database.db'
 
 app = Flask(__name__)
 CORS(app)
-app.config['SQLALCHEMY_POOL_RECYCLE'] = 28800 - 1
-app.config['SQLALCHEMY_POOL_TIMEOUT'] = 18000
 app.config['JWT_SECRET_KEY'] = 'please-remember-to-change-me'
+app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
+app.config['SQLALCHEMY_POOL_RECYCLE'] = 299
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 jwt = JWTManager(app)
+database.db.init_app(app)
+database.db.app = app
 
 #=============================RESPONSES====================================
 HOMEPAGE = json.dumps({'render': 'home'})
@@ -52,10 +59,10 @@ def welcome():
 def login():
     username = request.json['username'].lower()
     password = request.json['password']
-    if handler.credentials_valid(username, password):
+    if database.credentials_valid(username, password):
         while True:
             access_token = create_access_token(identity=username)
-            user_data = handler.get_user_data(username)
+            user_data = database.get_user_data(username)
             if user_data != None and access_token != None: 
                 tokens.append(access_token)
                 users.append(user_data)
@@ -74,23 +81,23 @@ def logout():
 @app.route('/signup', methods=['POST'])
 def signup():
     username = request.json['username'].lower()
-    password = handler.hash_password(request.json['password'])
+    password = request.json['password']
     email = request.json['email']
     invitation_code = request.json['invitationCode']
     if username == '' or password == '' or email == '':
         return EMPTY_ERROR
-    if handler.username_exists(username) or len(username) < 8 or len(username) > 25:
+    if database.username_exists(username) or len(username) < 8 or len(username) > 25:
         return USERNAME_ERROR
-    elif handler.email_exists(email):
+    elif database.email_exists(email):
         return EMAIL_ERROR
-    #elif len(password) < 8 or len(password) > 25: TODO just check in the front end lol, also this checks the hash not the actual password
-        #return PASSWORD_ERROR
+    elif len(password) < 8 or len(password) > 25:
+        return PASSWORD_ERROR
     else:
         while True:
-            handler.add_user(username, password, email) # TODO add invitation code here!!!
+            database.add_user(username, password, email) # TODO add invitation code here!!!
             # TODO add check to know if commit was successful===========================================
             access_token = create_access_token(identity=username)
-            user_data = handler.get_user_data(username)
+            user_data = database.get_user_data(username)
             if user_data != None and access_token != None: 
                 tokens.append(access_token)
                 users.append(user_data)
@@ -107,14 +114,14 @@ def signup():
             #old_password = request.json['old_password']
             #username = session['username']
             #new_password = request.json['new_password']
-            #if handler.credentials_valid(username, old_password):
+            #if database.credentials_valid(username, old_password):
                 #if new_password != '':
-                    #password = handler.hash_password(new_password)
-                    #handler.change_user(password=password)
+                    #password = database.hash_password(new_password)
+                    #database.change_user(password=password)
                     #return json.dumps({'status': 'saved'})
                 #return json.dumps({'status': 'Password empty'})
             #return json.dumps({'status': 'Wrong password'})
-        #return flask.render_template('settings.html', user=handler.get_user())
+        #return flask.render_template('settings.html', user=database.get_user())
     #return LOGIN
         
 
@@ -125,5 +132,5 @@ def handle_error(e):
     if isinstance(e, HTTPException):
         return json.dumps({'error': str(e), 'code': e.code})
 '''
-@app.errorhandler(500)
+@app.errordatabase(500)
 '''
