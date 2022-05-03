@@ -1,15 +1,15 @@
-#!/user/bin/env python3
 import database
-from flask import Flask, session, request
-from flask_jwt_extended import create_access_token, JWTManager
-from flask_cors import CORS, cross_origin
-from flask_sqlalchemy import SQLAlchemy
-from werkzeug.exceptions import HTTPException
-from datetime import timedelta
+
 import json
 import sys
 import os
 import sqlite3
+from flask import Flask, session, request
+from flask_jwt_extended import create_access_token, JWTManager
+from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.exceptions import HTTPException
+from datetime import timedelta
 
 SQLALCHEMY_DATABASE_URI = 'sqlite:///database.db'
 

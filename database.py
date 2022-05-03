@@ -22,25 +22,24 @@ class User(db.Model):
     lastActive = db.Column(db.DateTime)
     invitationCode = db.Column(db.String(10), unique=True)
     picUrl = db.Column(db.String(10))
-    balance = db.Column(db.Float, default=0.00)
+    balance = db.Column(db.Float, default=0)
     tasksCompleted = db.Column(db.Integer, default=0)
-    taskProfit = db.Column(db.Float, default=0.00)
-    invitationCommision = db.Column(db.Float, default=0.00)
+    taskProfit = db.Column(db.Float, default=0)
+    invitationCommision = db.Column(db.Float, default=0)
 
-    def __init__(self, username, email, password, invitationCode):
+    def __init__(self, username, email, password, invitationCode, invitedFrom):
         self.username = username
         self.email = email
         self.password = generate_password_hash(password)
         self.confirmedEmail = False
         self.created = created=datetime.now()
         self.vip = 1
+        self.multiplier = 0.5
         self.lastActive = created=datetime.now()
-        self.invitationCode = invitationCode #handler.create_random_code()
-        self.invitationCommision =  0.0
+        self.invitationCode = invitationCode
+        self.invitedFrom = invitedFrom
         self.picUrl = 'none'
-        self.balance = 0.0
-        self.taskProfit = 0.0
-        self.tasksCompleted = 0
+        self.balance = 0
 
     def __repr__(self):
         return '<User %r>' % self.username
@@ -62,8 +61,7 @@ class User(db.Model):
             'picUrl': self.picUrl,
             'balance': self.balance,
             'taskProfit': self.taskProfit,
-            'invitationCommision': self.invitationCommision
-        }, indent=4, sort_keys=True, default=str)
+        }, indent=4, default=str, sort_keys=True)
 
 class Task(db.Model):
     __tablename__ = "task"
@@ -93,16 +91,15 @@ class Task(db.Model):
             'link': self.link,
             'submited': self.submited
         })
-
-def init_db():
-    db.create_all()
     
 def get_user_data(username):
     return User.query.filter_by(username=username).first().get_json()
 
 def credentials_valid(username, password):
     user = User.query.filter_by(username=username).first()
-    return user.validate_password(password)
+    if user:
+        return user.validate_password(password)
+    return False
 
 def username_exists(username):
     return User.query.filter_by(username=username).first()
@@ -122,6 +119,9 @@ def create_random_code():
     while User.query.filter_by(invitationCode=code).first():
         code = ''.join(random.choice(chars) for _ in range(size))
     return code
+
+def init_db():
+    db.create_all()
 
 if __name__ == '__main__':
     init_db()
