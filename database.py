@@ -21,20 +21,17 @@ class User(db.Model):
     vip = db.Column(db.Integer)
     lastActive = db.Column(db.DateTime)
     invitationCode = db.Column(db.String(10), unique=True)
+    invitedFrom = db.Column(db.String(10), default='NOBODY')
     picUrl = db.Column(db.String(10))
     balance = db.Column(db.Float, default=0)
-    tasksCompleted = db.Column(db.Integer, default=0)
-    taskProfit = db.Column(db.Float, default=0)
-    invitationCommision = db.Column(db.Float, default=0)
 
-    def __init__(self, username, email, password, invitationCode, invitedFrom):
+    def __init__(self, username, email, password, invitationCode, invitedFrom='NOBODY'):
         self.username = username
         self.email = email
         self.password = generate_password_hash(password)
         self.confirmedEmail = False
         self.created = created=datetime.now()
         self.vip = 1
-        self.multiplier = 0.5
         self.lastActive = created=datetime.now()
         self.invitationCode = invitationCode
         self.invitedFrom = invitedFrom
@@ -57,10 +54,11 @@ class User(db.Model):
             'vip': self.vip,
             'lastActive': self.lastActive,
             'invitationCode': self.invitationCode,
-            'invitationCommision': self.invitationCommision,
+            'invitedFrom': self.invitationCode,
+            'invitationCommision': 0,#self.invitationCommision,
             'picUrl': self.picUrl,
             'balance': self.balance,
-            'taskProfit': self.taskProfit,
+            'taskProfit': 0#self.taskProfit,
         }, indent=4, default=str, sort_keys=True)
 
 class Task(db.Model):

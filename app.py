@@ -44,7 +44,7 @@ users = []
 @app.route('/', methods=['POST'])
 def welcome():
     access_token = request.json['access_token']
-    if access_token in tokens:
+    if access_token in tokens and access_token != "None":
         while True:
             user_data = ''
             for index, token in enumerate(tokens):
@@ -52,16 +52,20 @@ def welcome():
                     user_data = users[index]
             if user_data != None and user_data != '': break
         return json.dumps({'user_data': user_data})
-    return json.dumps({'error': 'invalid_token'})
+    return json.dumps({'state': 'logout'})
 
 #==============================LOGIN===================================
 @app.route('/login', methods=['POST'])
 def login():
     username = request.json['username'].lower()
     password = request.json['password']
+    remember = request.json['remember']
     if database.credentials_valid(username, password):
         while True:
-            access_token = create_access_token(identity=username)
+            if remember == True:
+                access_token = create_access_token(identity=username)
+            else:
+                access_token = "None"
             user_data = database.get_user_data(username)
             if user_data != None and access_token != None: 
                 tokens.append(access_token)
