@@ -35,6 +35,7 @@ EMAIL_ERROR = json.dumps({'error': 'email_unavailable'})
 PASSWORD_ERROR = json.dumps({'error': 'password_error'})
 EMPTY_ERROR = json.dumps({'error': 'empty_fields'})
 SUCCESS = json.dumps({'success': True})
+ERROR = json.dumps({'success': False})
 
 #==============================ACCESS-CONNECTIONS======================
 tokens = []
@@ -123,7 +124,18 @@ def password():
             return SUCCESS
         return PASSWORD_ERROR
     return INVALID_CREDENTIALS
-        
+
+#========================RETURN-MANUAL============================================
+@app.route('/guide', methods=['GET'])
+def guide():
+    try:
+        file = open('assets/guide.json')
+        guide = json.load(file)
+        return guide
+    except:
+        return ERROR
+
+ 
 
 #=============================ERROR============================================
 @app.errorhandler(Exception)
