@@ -135,7 +135,15 @@ def guide():
     except:
         return ERROR
 
- 
+#=========================LOGOUT===============================================
+@app.route('/logout', methods=['POST'])
+def logout():
+    access_token = request.json['access_token']
+    for index, token in enumerate(tokens):
+        if access_token == token:
+            tokens.remove(index)
+            users.remove(index)
+    return SUCCESS
 
 #=============================ERROR============================================
 @app.errorhandler(Exception)
