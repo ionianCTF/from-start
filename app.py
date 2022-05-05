@@ -34,6 +34,7 @@ USERNAME_ERROR = json.dumps({'error': 'username_unavailable'})
 EMAIL_ERROR = json.dumps({'error': 'email_unavailable'})
 PASSWORD_ERROR = json.dumps({'error': 'password_error'})
 EMPTY_ERROR = json.dumps({'error': 'empty_fields'})
+SUCCESS = json.dumps({'success': True})
 
 #==============================ACCESS-CONNECTIONS======================
 tokens = []
@@ -110,23 +111,18 @@ def signup():
         return response
     return SIGNUP_ERROR
 
-#==========================Settings=======================================
-#@app.route('/settings', methods=['GET', 'POST'])
-#def settings():
-    #if session.get('logged_in'):
-        #if request.method == 'POST':
-            #old_password = request.json['old_password']
-            #username = session['username']
-            #new_password = request.json['new_password']
-            #if database.credentials_valid(username, old_password):
-                #if new_password != '':
-                    #password = database.hash_password(new_password)
-                    #database.change_user(password=password)
-                    #return json.dumps({'status': 'saved'})
-                #return json.dumps({'status': 'Password empty'})
-            #return json.dumps({'status': 'Wrong password'})
-        #return flask.render_template('settings.html', user=database.get_user())
-    #return LOGIN
+#==========================CHANGE-PASSWORD=======================================
+@app.route('/password', methods=['POST'])
+def password():
+    username = request.json['username'].lower()
+    password = request.json['password']
+    new = request.json['new']
+    if database.credentials_valid(username, password):
+        if len(new) >= 8 and len(new) <= 25:
+            database.change_user_password(username, new)
+            return SUCCESS
+        return PASSWORD_ERROR
+    return INVALID_CREDENTIALS
         
 
 #=============================ERROR============================================

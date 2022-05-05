@@ -61,6 +61,11 @@ class User(db.Model):
             'taskProfit': 0#self.taskProfit,
         }, indent=4, default=str, sort_keys=True)
 
+def change_user_password(username, password):
+    user = User.query.filter_by(username=username).first()
+    user.password = generate_password_hash(password)
+    db.session.commit()
+
 class Task(db.Model):
     __tablename__ = "task"
     
@@ -120,6 +125,9 @@ def create_random_code():
 
 def init_db():
     db.create_all()
+    user = User('useruser', 'user@user.com', '12345678', '1234567890')
+    db.session.add(user)
+    db.session.commit()
 
 if __name__ == '__main__':
     init_db()
