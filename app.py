@@ -77,12 +77,6 @@ def login():
         return response
     return INVALID_CREDENTIALS
 
-@app.route('/logout')
-def logout():
-    session['logged_in'] = False
-    session['username'] = None
-    return LOGIN
-
 #============================SIGNUP=====================================
 @app.route('/signup', methods=['POST'])
 def signup():
