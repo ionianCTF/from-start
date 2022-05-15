@@ -139,6 +139,24 @@ def logout():
             users.remove(index)
     return SUCCESS
 
+#=========================TASKS================================================
+@app.route('/tasks', methods=['GET'])
+def task():
+    username = request.json['username'].lower()
+    function = request.json['function']
+    if function == 'get':
+        tasks = database.get_user_tasks(username)
+        return json.dumps({'tasks': tasks})
+    elif function == 'add':
+        social = request.json['social']
+        if database.add_task(username, social) == 0:
+            return ERROR
+        else:
+            return SUCCESS
+
+
+
+
 #=============================ERROR============================================
 @app.errorhandler(Exception)
 def handle_error(e):
