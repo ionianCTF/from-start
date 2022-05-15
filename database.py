@@ -1,8 +1,8 @@
 import sys
 import os
 import json
-import string
 import random
+import helpers
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
@@ -111,23 +111,12 @@ def email_exists(email):
     return User.query.filter_by(email=email).first()
 
 def add_user(username, password, email):
-    user = User(username=username, password=password, email=email, invitationCode=create_random_code())
+    user = User(username=username, password=password, email=email, invitationCode=helpers.create_random_code(), invitedFrom=invitedFrom)
     db.session.add(user)
     db.session.commit()
-
-def create_random_code():
-    chars=string.ascii_uppercase + string.digits
-    size = 10
-    code = ''.join(random.choice(chars) for _ in range(size))
-    while User.query.filter_by(invitationCode=code).first():
-        code = ''.join(random.choice(chars) for _ in range(size))
-    return code
 
 def init_db():
     db.create_all()
     user = User('useruser', 'user@user.com', '12345678', '1234567890')
     db.session.add(user)
     db.session.commit()
-
-if __name__ == '__main__':
-    init_db()

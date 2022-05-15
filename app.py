@@ -94,7 +94,7 @@ def signup():
         return PASSWORD_ERROR
     else:
         while True:
-            database.add_user(username, password, email) # TODO add invitation code here!!!
+            database.add_user(username, password, email, invitation_code) # TODO add invitation code here!!!
             # TODO add check to know if commit was successful===========================================
             access_token = create_access_token(identity=username)
             user_data = database.get_user_data(username)
