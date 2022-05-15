@@ -55,10 +55,11 @@ class User(db.Model):
             'lastActive': self.lastActive,
             'invitationCode': self.invitationCode,
             'invitedFrom': self.invitationCode,
-            'invitationCommision': 0,#self.invitationCommision,
+            'invitationCommision': self.invitationCommision,
             'picUrl': self.picUrl,
             'balance': self.balance,
-            'taskProfit': 0#self.taskProfit,
+            'taskProfit': self.taskProfit,
+            'tasks': get_user_tasks(self.username)
         }, indent=4, default=str, sort_keys=True)
 
 class Task(db.Model):
@@ -97,7 +98,7 @@ class Task(db.Model):
             'duration': self.duration,
             'requirements': self.requirements,
             'link': self.link,
-            'submited': self.submited
+            'submited': self.submited,
         }, indent=4, default=str, sort_keys=True)
 
 def change_user_password(username, password):
@@ -153,11 +154,11 @@ def get_user_tasks(username):
     last_3_hours = datetime.now() - timedelta(hours = 3) # TODO custom timeout threshold
     tasks = []
     # Delete very old tasks
-    for task in Task.query.filter(Task.user_id == user.id, Task.created > last_week).all():
+    for task in Task.query.filter(Task.user_id == user.id, Task.created < last_week).all():
         task.delete()
         db.session.commit()
     # Update to timeout timeouted tasks
-    for task in Task.query.filter(Task.user_id == user.id, Task.created > last_3_hours).all():
+    for task in Task.query.filter(Task.user_id == user.id, Task.created < last_3_hours).all():
         if task.status == 0: update_task(task.id, 3)
     # Return tasks from last 24h
     for task in Task.query.filter(Task.user_id == user.id, Task.created > yesterday).all():
