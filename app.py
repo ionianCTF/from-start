@@ -153,6 +153,10 @@ def task():
             return ERROR
         else:
             return SUCCESS
+    elif function == 'done':
+        id = request.json['id']
+        database.update_task(id, 1)
+        return SUCCESS
 
 
 

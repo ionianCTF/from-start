@@ -141,8 +141,6 @@ def add_task(username, social, hours=3):
         task = Task(user_id=user.id, social=social, hours=hours)
         db.session.add(task)
         db.session.commit()
-        helpers.set_interval(delete_task(task.id), 604800) # Week in seconds
-        helpers.set_interval(timeout_task(task.id), 10800) # 3 hours in seconds
         return 1
 
 def get_user_tasks(username):
@@ -151,7 +149,17 @@ def get_user_tasks(username):
     daily_tasks = []
     # Query tasks where the created datetime is bigger than yesterday 
     yesterday = datetime.now() - timedelta(days = 1)
+    last_week = datetime.now() - timedelta(days = 7)
+    last_3_hours = datetime.now() - timedelta(hours = 3) # TODO custom timeout threshold
     tasks = []
+    # Delete very old tasks
+    for task in Task.query.filter(Task.user_id == user.id, Task.created > last_week).all():
+        task.delete()
+        db.session.commit()
+    # Update to timeout timeouted tasks
+    for task in Task.query.filter(Task.user_id == user.id, Task.created > last_3_hours).all():
+        if task.status == 0: update_task(task.id, 3)
+    # Return tasks from last 24h
     for task in Task.query.filter(Task.user_id == user.id, Task.created > yesterday).all():
         tasks.append(task.get_json())
     return tasks
@@ -167,8 +175,10 @@ def delete_task(id):
     db.session.commit()
 
 def update_task(id, status):
-    Task.query.filter_by(id=id).status = status
+    Task.query.filter_by(id=id).first().status = status
     db.session.commit()
+
+#def approve and pay task TODO TODO TODO
 
 def timeout_task(id):
     task = Task.query.filter_by(id=id)
