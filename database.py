@@ -2,7 +2,7 @@ import sys
 import os
 import json
 import random
-import helpers
+import string
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
@@ -21,7 +21,9 @@ class User(db.Model):
     level = db.Column(db.Integer)
     lastActive = db.Column(db.DateTime)
     invitationCode = db.Column(db.String(10), unique=True)
+    invitationCommision = db.Column(db.Float(10), default=0)
     invitedFrom = db.Column(db.String(10), default='NOBODY')
+    taskProfit = db.Column(db.Float(10), default=0)
     picUrl = db.Column(db.String(10))
     balance = db.Column(db.Float, default=0)
 
@@ -121,8 +123,8 @@ def username_exists(username):
 def email_exists(email):
     return User.query.filter_by(email=email).first()
 
-def add_user(username, password, email):
-    user = User(username=username, password=password, email=email, invitationCode=helpers.create_random_code(), invitedFrom=invitedFrom)
+def add_user(username, password, email, invitation_code='00000000'):
+    user = User(username=username, password=password, email=email, invitationCode=create_random_code(), invitedFrom=invitation_code)
     #reward_referrer(invitedFrom)
     db.session.add(user)
     db.session.commit()
@@ -143,27 +145,31 @@ def add_task(username, social, hours=3):
         db.session.add(task)
         db.session.commit()
         return 1
-
+    
 def get_user_tasks(username):
     user = User.query.filter_by(username=username).first()
     tasks = Task.query.filter_by(user_id=user.id).all()
     daily_tasks = []
+
     # Query tasks where the created datetime is bigger than yesterday 
     yesterday = datetime.now() - timedelta(days = 1)
     last_week = datetime.now() - timedelta(days = 7)
     last_3_hours = datetime.now() - timedelta(hours = 3) # TODO custom timeout threshold
-    tasks = []
+    final_tasks = []
+
     # Delete very old tasks
     for task in Task.query.filter(Task.user_id == user.id, Task.created < last_week).all():
         task.delete()
         db.session.commit()
+
     # Update to timeout timeouted tasks
     for task in Task.query.filter(Task.user_id == user.id, Task.created < last_3_hours).all():
         if task.status == 0: update_task(task.id, 3)
+
     # Return tasks from last 24h
     for task in Task.query.filter(Task.user_id == user.id, Task.created > yesterday).all():
-        tasks.append(task.get_json())
-    return tasks
+        final_tasks.append(task.get_json())
+    return final_tasks
 
 def init_db():
     db.create_all()
@@ -178,6 +184,14 @@ def delete_task(id):
 def update_task(id, status):
     Task.query.filter_by(id=id).first().status = status
     db.session.commit()
+
+def create_random_code():
+    chars=string.ascii_uppercase + string.digits
+    size = 10
+    code = ''.join(random.choice(chars) for _ in range(size))
+    while User.query.filter_by(invitationCode=code).first():
+        code = ''.join(random.choice(chars) for _ in range(size))
+    return code
 
 #def approve and pay task TODO TODO TODO
 

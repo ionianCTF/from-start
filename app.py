@@ -140,7 +140,7 @@ def logout():
     return SUCCESS
 
 #=========================TASKS================================================
-@app.route('/tasks', methods=['GET'])
+@app.route('/tasks', methods=['POST'])
 def task():
     username = request.json['username'].lower()
     function = request.json['function']
