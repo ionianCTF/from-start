@@ -4,6 +4,9 @@ import json
 import sys
 import os
 import sqlite3
+import string
+import random
+from datetime import datetime
 from flask import Flask, session, request
 from flask_jwt_extended import create_access_token, JWTManager
 from flask_cors import CORS
@@ -142,21 +145,50 @@ def logout():
 #=========================TASKS================================================
 @app.route('/tasks', methods=['POST'])
 def task():
-    username = request.json['username'].lower()
     function = request.json['function']
     if function == 'get':
+        username = request.json['username'].lower()
         tasks = database.get_user_tasks(username)
         return json.dumps({'tasks': tasks})
     elif function == 'add':
+        username = request.json['username'].lower()
         social = request.json['social']
         if database.add_task(username, social) == 0:
             return ERROR
         else:
             return SUCCESS
-    elif function == 'done':
+    elif function == 'update':
         id = request.json['id']
         database.update_task(id, 1)
         return SUCCESS
+
+#=======================FEED==================================================
+feed_stack = []
+start_time = datetime.now()
+wait = random.randint(1, 59)
+
+@app.route('/feed', methods=['GET'])
+def feed():
+    global start_time, wait
+    if len(feed_stack) == 0:
+        for i in range(0, 6):
+            # Create random username and level
+            username = random.choice(string.ascii_letters) + random.randint(7, 14)*"*" + random.choice(string.ascii_letters)
+            upgraded_to = random.randint(2, 6)
+            feed_stack.append([username, upgraded_to])
+        return json.dumps({'feed': feed_stack})
+    elif (start_time - datetime.now()).total_seconds() >= wait:
+        stack.pop()
+        start_time = datetime.now()
+        wait = random.randint(1, 19)
+        # Create new feed
+        username = random.choice(string.ascii_letters) + random.randint(7, 19)*"*" + random.choice(string.ascii_letters)
+        upgraded_to = random.randint(2, 6)
+        feed_stack.append([username, upgraded_to])
+        stack.append()
+        return json.dumps({'feed': feed_stack})
+    return json.dumps({'feed': feed_stack})
+
 
 
 

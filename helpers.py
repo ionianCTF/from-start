@@ -1,6 +1,5 @@
 import string
 import random
-import threading
 
 def create_random_code():
     chars=string.ascii_uppercase + string.digits
